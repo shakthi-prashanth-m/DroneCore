@@ -106,8 +106,7 @@ void MavlinkParameters::do_work()
         if (work.extended) {
 
             char param_value_buf[128] = {};
-            const float temp_to_copy = work.param_value.get_float_casted_value();
-            memcpy(&param_value_buf[0], &temp_to_copy, sizeof(float));
+            work.param_value.get_128_bytes(param_value_buf);
 
             // FIXME: extended currently always go to the camera component
             mavlink_msg_param_ext_set_pack(_parent.get_own_system_id(),
@@ -117,7 +116,7 @@ void MavlinkParameters::do_work()
                                            MAV_COMP_ID_CAMERA,
                                            param_id,
                                            param_value_buf,
-                                           work.param_value.get_mav_param_type());
+                                           work.param_value.get_mav_param_ext_type());
         } else {
             mavlink_msg_param_set_pack(_parent.get_own_system_id(),
                                        _parent.get_own_component_id(),
@@ -125,7 +124,7 @@ void MavlinkParameters::do_work()
                                        _parent.get_target_system_id(),
                                        _parent.get_target_component_id(),
                                        param_id,
-                                       work.param_value.get_float_casted_value(),
+                                       work.param_value.get_4_float_bytes(),
                                        work.param_value.get_mav_param_type());
         }
 
