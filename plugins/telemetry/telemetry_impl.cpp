@@ -346,6 +346,11 @@ void TelemetryImpl::process_home_position(const mavlink_message_t &message)
 {
     mavlink_home_position_t home_position;
     mavlink_msg_home_position_decode(&message, &home_position);
+
+    LogDebug() << "Home Lat: " << home_position.latitude << ", "
+               << "Lon: " << home_position.longitude << ", "
+               << "Alt: " << home_position.altitude;
+
     set_home_position(Telemetry::Position({home_position.latitude * 1e-7,
                                            home_position.longitude * 1e-7,
                                            home_position.altitude * 1e-3f,
@@ -416,7 +421,11 @@ void TelemetryImpl::process_gps_raw_int(const mavlink_message_t &message)
     // TODO: This is just an interim hack, we will have to look at
     //       estimator flags in order to decide if the position
     //       estimate is good enough.
-    const bool gps_ok = ((gps_raw_int.fix_type >= 3) && (gps_raw_int.satellites_visible >= 8));
+    const bool gps_ok = (gps_raw_int.fix_type >= GPS_FIX_TYPE_3D_FIX);
+
+    LogDebug() << "GPS Fix type: " << int(gps_raw_int.fix_type)
+               << " GPS # of satellites: " << int(gps_raw_int.satellites_visible)
+               << " GPS: " << (gps_ok ? "" : "NOT ") << "OK";
 
     set_health_global_position(gps_ok);
     // Local is not different from global for now until things like flow are in place.
