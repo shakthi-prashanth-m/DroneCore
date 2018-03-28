@@ -13,20 +13,20 @@ public:
     CoreServiceImpl(DroneCore &dc)
         : dc(dc) {}
 
-    Status SubscribeDevices(ServerContext *context,
-                            const rpc::core::SubscribeDevicesRequest *request,
-                            ServerWriter<rpc::core::Device> *writer) override
+    Status SubscribeSystems(ServerContext *context,
+                            const rpc::core::SubscribeSystemsRequest *request,
+                            ServerWriter<rpc::core::System> *writer) override
     {
-        std::vector<uint64_t> list = dc.device_uuids();
+        std::vector<uint64_t> list = dc.system_uuids();
 
-        for (auto uuid : dc.device_uuids()) {
+        for (auto uuid : dc.system_uuids()) {
             auto *rpc_uuid = new rpc::core::UUID();
             rpc_uuid->set_value(uuid);
 
-            rpc::core::Device device;
-            device.set_allocated_uuid(rpc_uuid);
+            rpc::core::System system;
+            system.set_allocated_uuid(rpc_uuid);
 
-            writer->Write(device);
+            writer->Write(system);
         }
 
         return Status::OK;
